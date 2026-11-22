@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block titulo %}Mi biblioteca{% endblock %}
+
+{% block contenido %}
+    <h1>📚 Mi biblioteca</h1>
+    <p>Hola, {{ nombre }}. Hoy es {{ fecha }}</p>
+
+    <h2 style="margin-top: 2rem;">Añadir libro</h2>
+
+    <form method="POST" action="{{ url_for('inicio') }}"
+          style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 12px; display: inline-block; margin-top: 1rem;">
+        <input type="text" name="titulo" placeholder="Título del libro" required
+               style="padding: 10px; border-radius: 8px; border: none; margin: 5px; width: 240px;">
+        <input type="text" name="autor" placeholder="Autor" required
+               style="padding: 10px; border-radius: 8px; border: none; margin: 5px; width: 180px;">
+        <textarea name="resena" placeholder="Reseña o notas (opcional)"
+                  rows="2"
+                  style="padding: 10px; border-radius: 8px; border: none; margin: 5px; width: 100%; max-width: 500px; font-family: inherit;"></textarea>
+        <button type="submit"
+                style="padding: 10px 20px; border-radius: 8px; border: none; background: #48bb78; color: white; font-weight: bold; cursor: pointer; margin: 5px;">
+            ➕ Añadir
+        </button>
+    </form>
+
+    <h2 style="margin-top: 2rem;">Mis libros ({{ num_libros }})</h2>
+
+    <ul style="list-style: none; margin-top: 1rem; text-align: left; display: inline-block; padding: 0;">
+        {% for libro in libros %}
+            <li style="background: rgba(255,255,255,0.15); padding: 12px 20px; margin: 8px 0; border-radius: 8px;
+                       display: flex; justify-content: space-between; align-items: flex-start; gap: 15px;">
+                <div style="flex: 1;">
+                    <strong>{{ libro.titulo }}</strong><br>
+                    <small>Autor: {{ libro.autor }}</small><br>
+                    <small>Añadido: {{ libro.creado }}</small>
+
+                    {% if libro.resena %}
+                        <div style="margin-top: 8px; padding: 8px 12px; background: rgba(0,0,0,0.15); border-radius: 8px; font-style: italic;">
+                            “{{ libro.resena }}”
+                        </div>
+                    {% else %}
+                        <div style="margin-top: 8px; opacity: 0.6; font-size: 0.9em;">Sin reseña todavía.</div>
+                    {% endif %}
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 8px; align-items: stretch;">
+                    <form method="POST" action="{{ url_for('cambiar_estado', libro_id=libro.id) }}"
+                          style="display: flex; align-items: center; gap: 6px;">
+                        <select name="estado"
+                                style="padding: 8px; border-radius: 8px; border: none; font-size: 0.95em; cursor: pointer;">
+                            {% for estado in estados %}
+                                <option value="{{ estado }}" {% if estado == libro.estado %}selected{% endif %}>
+                                    {{ estado }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit"
+                                style="background: #4299e1; color: white; border: none; border-radius: 8px;
+                                       padding: 8px 12px; cursor: pointer;">
+                            💾
+                        </button>
+                    </form>
+
+                    <div style="display: flex; gap: 8px;">
+                        <a href="{{ url_for('editar_resena', libro_id=libro.id) }}"
+                           style="flex: 1; text-align: center; background: #ecc94b; color: #333; text-decoration: none;
+                                  border-radius: 8px; padding: 8px 12px; font-weight: bold;">
+                            ✏️
+                        </a>
+
+                        <form method="POST" action="{{ url_for('borrar_libro', libro_id=libro.id) }}"
+                              onsubmit="return confirm('¿Seguro que quieres borrar «{{ libro.titulo }}»?');"
+                              style="flex: 1;">
+                            <button type="submit"
+                                    style="width: 100%; background: #e53e3e; color: white; border: none; border-radius: 8px;
+                                           padding: 8px 12px; cursor: pointer;">
+                                🗑️
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+
+    {% if num_libros == 0 %}
+        <p style="margin-top: 1rem;">Aún no has añadido ningún libro. ¡Empieza con el formulario de arriba! 📖</p>
+    {% elif num_libros < 3 %}
+        <p style="margin-top: 1rem;">Vas empezando tu biblioteca. ¡Añade más libros! 📚</p>
+    {% else %}
+        <p style="margin-top: 1rem;">¡Buena biblioteca llevas, sigue así! 🎉</p>
+    {% endif %}
+{% endblock %}
