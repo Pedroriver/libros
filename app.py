@@ -106,7 +106,8 @@ def cambiar_estado(libro_id):
 def sobre_mi():
     return render_template('sobre_mi.html')
 
+init_db()
+
 
 if __name__ == '__main__':
-    init_db()
     app.run(debug=True)
